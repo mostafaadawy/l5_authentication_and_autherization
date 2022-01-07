@@ -1,4 +1,5 @@
 import express, { Request, Response } from 'express'
+import Authorize from '../helpers/jwtAuthorizer'
 import { Article, ArticleStore } from '../models/article'
 
 const store = new ArticleStore()
@@ -15,7 +16,15 @@ const index = async (_req: Request, res: Response) => {
   }
   
   const create = async (req: Request, res: Response) => {
-      try {
+    try {
+		Authorize(req);
+	} catch (err) {
+		res.status(401);
+		return res.json(err);
+	}  
+    
+    
+    try {
           const a= {
               title: req.body.title,
               content: req.body.content,
@@ -29,6 +38,12 @@ const index = async (_req: Request, res: Response) => {
   }
   
   const destroy = async (req: Request, res: Response) => {
+    try {
+		Authorize(req);
+	} catch (err) {
+		res.status(401);
+		return res.json(err);
+	}  
       const deleted = await store.delete(req.body.id)
       res.json(deleted)
   }
